@@ -7,8 +7,8 @@ INCREASE_MINUTE = 2 # boost of minute differences
 import sys
 from PIL import Image
 
-img1 = Image.open(sys.argv[1])
-img2 = Image.open(sys.argv[2])
+img1 = Image.open(sys.argv[1]).convert('RGB')
+img2 = Image.open(sys.argv[2]).convert('RGB')
 
 i1 = img1.load()
 i2 = img2.load()

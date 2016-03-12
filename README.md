@@ -32,6 +32,14 @@ but the generated diff image is an all-or-nothing comparison. I needed
 a diff image for quick inspection of changes, and the image should show
 the magnitude of these differences, as well as how color was affected.
 
+# Bugs
+
+Alpha channel of images is not taken into consideration yet. Not sure
+how to represent changes in alpha on the diff image.
+
+Differences in 48-bit images may be exagerated in diff image. Images with
+different color dephts are not correctly compared.
+
 # Contact
 
 Elvis Pfützenreuter - epxx@epxx.co - https://epxx.co

@@ -8,8 +8,8 @@ use std::path::Path;
 
 fn main()
 {
-	let minute: i16 = 5;
-	let increase_minute: i16 = 2;
+	let minute: i64 = 5;
+	let increase_minute: i64 = 2;
 	let mut totaldiff: u64 = 0;
 	
 	let args: Vec<_> = env::args().collect();
@@ -22,23 +22,26 @@ fn main()
 	}
 	
 	let (width, height) = img1.dimensions();
+
+	let img1 = img1.to_rgb();
+	let img2 = img2.to_rgb();
 	
 	let mut imgmap = ImageBuffer::new(width, height);
 	
 	for (x, y, mappixel) in imgmap.enumerate_pixels_mut() {
        		let p1 = img1.get_pixel(x, y);
        		let p2 = img2.get_pixel(x, y);
-		let mut diffpixel: [i16; 3] = [255, 255, 255];
+		let mut diffpixel: [i64; 3] = [255, 255, 255];
 	
-		let diffs: [i16; 3] = [(p2[0] as i16) - (p1[0] as i16),
-					(p2[1] as i16) - (p1[1] as i16),
-					(p2[2] as i16) - (p1[2] as i16)];
+		let diffs: [i64; 3] = [(p2[0] as i64) - (p1[0] as i64),
+					(p2[1] as i64) - (p1[1] as i64),
+					(p2[2] as i64) - (p1[2] as i64)];
 		let absdiff = diffs[0].abs() + diffs[1].abs() + diffs[2].abs();
 		totaldiff += absdiff as u64;
-		let diffplus: [i16; 3] = [cmp::max(0, diffs[0]),
+		let diffplus: [i64; 3] = [cmp::max(0, diffs[0]),
 			cmp::max(0, diffs[1]), cmp::max(0, diffs[2])];
 		let totplus = diffplus[0] + diffplus[1] + diffplus[2];
-		let diffminus: [i16; 3] = [cmp::min(0, diffs[0]),
+		let diffminus: [i64; 3] = [cmp::min(0, diffs[0]),
 			cmp::min(0, diffs[1]), cmp::min(0, diffs[2])];
 	
 		for i in 0..3 {

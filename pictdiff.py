@@ -20,8 +20,8 @@ if img1.size != img2.size:
 
 imgmap = Image.new( 'RGB', img1.size, "white")
 imap = imgmap.load()
+totaldiff = 0
 
-row_averages = []
 for y in range(img1.size[1]):
 	for x in range(img1.size[0]):
         	p1 = i1[x, y]
@@ -31,6 +31,7 @@ for y in range(img1.size[1]):
 		# color differences
 		diffs = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
 		absdiff = reduce(lambda a, b: abs(a) + abs(b), diffs)
+		totaldiff += absdiff
 		diffsmag = [a * TINT for a in diffs]
 		diffplus = [max(0, a) for a in diffs]
 		totplus = reduce(lambda a, b: a + b, diffplus)
@@ -51,3 +52,4 @@ for y in range(img1.size[1]):
 		imap[x, y] = tuple(diffpixel)
 
 imgmap.save(sys.argv[3])
+print totaldiff

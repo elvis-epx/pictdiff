@@ -3,8 +3,16 @@ use std::process;
 extern crate image;
 use image::GenericImage;
 use image::ImageBuffer;
+use image::Rgba;
 use std::cmp;
 use std::path::Path;
+
+fn pma(oldp: &Rgba<u8>, newp: &Rgba<u8>, channel: usize) -> i64
+{
+	let old = (oldp[channel] as f64) * ((oldp[3] as f64) / 255.0);
+	let new = (newp[channel] as f64) * ((newp[3] as f64) / 255.0);
+	(new as i64) - (old as i64)
+}
 
 fn main()
 {
@@ -23,8 +31,8 @@ fn main()
 	
 	let (width, height) = img1.dimensions();
 
-	let img1 = img1.to_rgb();
-	let img2 = img2.to_rgb();
+	let img1 = img1.to_rgba();
+	let img2 = img2.to_rgba();
 	
 	let mut imgmap = ImageBuffer::new(width, height);
 	
@@ -33,10 +41,12 @@ fn main()
        		let p2 = img2.get_pixel(x, y);
 		let mut diffpixel: [i64; 3] = [255, 255, 255];
 	
-		let diffs: [i64; 3] = [(p2[0] as i64) - (p1[0] as i64),
-					(p2[1] as i64) - (p1[1] as i64),
-					(p2[2] as i64) - (p1[2] as i64)];
-		let absdiff = diffs[0].abs() + diffs[1].abs() + diffs[2].abs();
+		let diffs: [i64; 4] = [pma(&p1, &p2, 0),
+					pma(&p1, &p2, 1),
+					pma(&p1, &p2, 2),
+					(p2[3] as i64) - (p1[3] as i64)];
+
+		let absdiff = diffs[0].abs() + diffs[1].abs() + diffs[2].abs() + diffs[3].abs();
 		totaldiff += absdiff as u64;
 		let diffplus: [i64; 3] = [cmp::max(0, diffs[0]),
 			cmp::max(0, diffs[1]), cmp::max(0, diffs[2])];

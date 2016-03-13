@@ -7,8 +7,8 @@ INCREASE_MINUTE = 2 # boost of minute differences
 import sys
 from PIL import Image
 
-img1 = Image.open(sys.argv[1]).convert('RGB')
-img2 = Image.open(sys.argv[2]).convert('RGB')
+img1 = Image.open(sys.argv[1]).convert('RGBA')
+img2 = Image.open(sys.argv[2]).convert('RGBA')
 
 i1 = img1.load()
 i2 = img2.load()
@@ -18,9 +18,18 @@ if img1.size != img2.size:
 		% (sys.argv[1], sys.argv[2])
 	sys.exit(1)
 
-imgmap = Image.new( 'RGB', img1.size, "white")
+imgmap = Image.new('RGB', img1.size, "white")
 imap = imgmap.load()
 totaldiff = 0
+
+# Premultiply alpha, so color differences are mitigated by transparency
+# Difference in alpha itself is accumulated separately in absdiff, so this
+# will not mask any differenct
+def pma(old, new, channel):
+	# simulate a black background
+	old = old[channel] * (old[3] / 255.0)
+	new = new[channel] * (new[3] / 255.0)
+	return int(new) - int(old)
 
 for y in range(img1.size[1]):
 	for x in range(img1.size[0]):
@@ -28,10 +37,13 @@ for y in range(img1.size[1]):
         	p2 = i2[x, y]
 		diffpixel = [255, 255, 255]
 
-		# color differences
-		diffs = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
+		# color differences, including alpha channel
+		diffs = [pma(p1, p2, 0), pma(p1, p2, 1), pma(p1, p2, 2), p2[3] - p1[3]]
 		absdiff = reduce(lambda a, b: abs(a) + abs(b), diffs)
 		totaldiff += absdiff
+
+		# these are for tinting, alpha left out of equation
+		diffs = diffs[0:3]
 		diffsmag = [a * TINT for a in diffs]
 		diffplus = [max(0, a) for a in diffs]
 		totplus = reduce(lambda a, b: a + b, diffplus)

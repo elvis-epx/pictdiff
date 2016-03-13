@@ -18,6 +18,15 @@ are also tinted to reflect the color changes. For example, if "img1"
 is generally more red than "img2", then "diff" will be cyan. On the
 other hand, if "img2" is more red, then "diff" is also red.
 
+Differences in alpha (opacity) are counted in two ways. They are added
+to the total absolute difference, which are rendered as gray in diff
+image. This guarantees that alpha differences will be revealed clearly.
+
+Also, the color channels are multiplied by alpha, so the color differences
+are mitigated when both images are quite transparent. For example, two
+completely transparent images (alpha=0) will be considered equal, even
+if one is "red" and another is "blue".
+
 How to run the Rust version:
 
 ```

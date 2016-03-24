@@ -7,6 +7,10 @@ INCREASE_MINUTE = 2 # boost of minute differences
 import sys
 from PIL import Image
 
+if len(sys.argv) < 4:
+	print "Usage: %s oldpicture newpicture diffmap" % sys.argv[0]
+	sys.exit(2)
+
 img1 = Image.open(sys.argv[1]).convert('RGBA')
 img2 = Image.open(sys.argv[2]).convert('RGBA')
 
@@ -25,7 +29,7 @@ totaldiff = 0
 # Premultiply alpha, so color differences are mitigated by transparency
 # Difference in alpha itself is accumulated separately in absdiff, so this
 # will not mask any differenct
-def pma(old, new, channel):
+def pre_mult_alpha(old, new, channel):
 	# simulate a black background
 	old = old[channel] * (old[3] / 255.0)
 	new = new[channel] * (new[3] / 255.0)
@@ -38,7 +42,12 @@ for y in range(img1.size[1]):
 		diffpixel = [255, 255, 255]
 
 		# color differences, including alpha channel
-		diffs = [pma(p1, p2, 0), pma(p1, p2, 1), pma(p1, p2, 2), p2[3] - p1[3]]
+		diffs = [
+				pre_mult_alpha(p1, p2, 0), 
+				pre_mult_alpha(p1, p2, 1),
+				pre_mult_alpha(p1, p2, 2),
+				p2[3] - p1[3]
+			]
 		absdiff = reduce(lambda a, b: abs(a) + abs(b), diffs)
 		totaldiff += absdiff
 

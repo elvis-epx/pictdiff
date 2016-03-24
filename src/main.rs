@@ -7,7 +7,7 @@ use image::Rgba;
 use std::cmp;
 use std::path::Path;
 
-fn pma(oldp: &Rgba<u8>, newp: &Rgba<u8>, channel: usize) -> i64
+fn pre_mult_alpha(oldp: &Rgba<u8>, newp: &Rgba<u8>, channel: usize) -> i64
 {
 	let old = (oldp[channel] as f64) * ((oldp[3] as f64) / 255.0);
 	let new = (newp[channel] as f64) * ((newp[3] as f64) / 255.0);
@@ -21,6 +21,11 @@ fn main()
 	let mut totaldiff: u64 = 0;
 	
 	let args: Vec<_> = env::args().collect();
+	if args.len() < 4 {
+		println!("Usage: {} oldpicture newpicture diffmap", &args[0]);
+		process::exit(2);
+	}
+
 	let img1 = image::open(&Path::new(&args[1])).unwrap();
 	let img2 = image::open(&Path::new(&args[2])).unwrap();
 	
@@ -41,9 +46,9 @@ fn main()
        		let p2 = img2.get_pixel(x, y);
 		let mut diffpixel: [i64; 3] = [255, 255, 255];
 	
-		let diffs: [i64; 4] = [pma(&p1, &p2, 0),
-					pma(&p1, &p2, 1),
-					pma(&p1, &p2, 2),
+		let diffs: [i64; 4] = [pre_mult_alpha(&p1, &p2, 0),
+					pre_mult_alpha(&p1, &p2, 1),
+					pre_mult_alpha(&p1, &p2, 2),
 					(p2[3] as i64) - (p1[3] as i64)];
 
 		let absdiff = diffs[0].abs() + diffs[1].abs() + diffs[2].abs() + diffs[3].abs();
@@ -69,7 +74,6 @@ fn main()
 		*mappixel = image::Rgb(diffpixel8);
 	}
 	
-	// let ref mut fout = File::create(&Path::new(&args[3])).unwrap();
 	let _ = imgmap.save(&args[3]).unwrap();
 	println!("{}", totaldiff);
 }

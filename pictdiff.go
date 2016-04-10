@@ -18,8 +18,16 @@ func tofloat(p color.Color) ([]float64) {
 			float64(a) / 65535.0}
 }
 
-func calcrow(ndiff chan float64, img1 image.Image, img2 image.Image, mapimg *image.NRGBA, y int) {
+type calcrowret struct {
+	Y int
+	Diff float64
+	Pixels *[]color.NRGBA
+}
+
+func calcrow(c chan calcrowret, img1 image.Image, img2 image.Image, mapimg *image.NRGBA, y int) {
 	totaldiff := 0.0
+	n := img1.Bounds().Max.X - img1.Bounds().Min.X
+	pixel_list := make([]color.NRGBA, n, n)
 
 	for x := img1.Bounds().Min.X; x < img1.Bounds().Max.X; x += 1 {
 		p1 := tofloat(img1.At(x, y))
@@ -49,10 +57,10 @@ func calcrow(ndiff chan float64, img1 image.Image, img2 image.Image, mapimg *ima
 				G: uint8(diffpixel[1] * 255.0), 
 				B: uint8(diffpixel[2] * 255.0),
 				A: 255}
-		mapimg.Set(x, y, p)
+		pixel_list[x - img1.Bounds().Min.X] = p
 	}
 
-	ndiff <- totaldiff
+	c <- calcrowret{Y: y, Diff: totaldiff, Pixels: &pixel_list}
 }
 
 func main() {
@@ -81,13 +89,16 @@ func main() {
 	mapimg := image.NewNRGBA(img1.Bounds())
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	diffmeasurements := make(chan float64, img1.Bounds().Max.Y - img1.Bounds().Min.Y)
+	diffmeasurements := make(chan calcrowret, img1.Bounds().Max.Y - img1.Bounds().Min.Y)
 	for y := img1.Bounds().Min.Y; y < img1.Bounds().Max.Y; y += 1 {
 		go calcrow(diffmeasurements, img1, img2, mapimg, y)
 	}
 	for y := img1.Bounds().Min.Y; y < img1.Bounds().Max.Y; y += 1 {
-		ndiff := <- diffmeasurements
-		totaldiff += ndiff
+		result := <- diffmeasurements
+		totaldiff += result.Diff
+		for x := img1.Bounds().Min.X; x < img1.Bounds().Max.X; x += 1 {
+			mapimg.Set(x, result.Y, (*result.Pixels)[x - img1.Bounds().Min.X])
+		}
 	}
 
 	mapfile, _ := os.Create(os.Args[3])

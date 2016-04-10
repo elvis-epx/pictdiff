@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-TINT = 1 # exxagerate differences in tone
 MINUTE = 5 # less than "x" points of difference
 INCREASE_MINUTE = 2 # boost of minute differences
 
@@ -53,7 +52,6 @@ for y in range(img1.size[1]):
 
 		# these are for tinting, alpha left out of equation
 		diffs = diffs[0:3]
-		diffsmag = [a * TINT for a in diffs]
 		diffplus = [max(0, a) for a in diffs]
 		totplus = reduce(lambda a, b: a + b, diffplus)
 		diffminus = [min(0, a) for a in diffs]

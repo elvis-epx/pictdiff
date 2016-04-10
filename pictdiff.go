@@ -8,6 +8,7 @@ import "os"
 import "log"
 import "math"
 import "fmt"
+import "runtime"
 
 func tofloat(p color.Color) ([]float64) {
 	r, g, b, a := p.RGBA()
@@ -15,6 +16,43 @@ func tofloat(p color.Color) ([]float64) {
 			float64(g) / 65535.0,
 			float64(b) / 65535.0,
 			float64(a) / 65535.0}
+}
+
+func calcrow(ndiff chan float64, img1 image.Image, img2 image.Image, mapimg *image.NRGBA, y int) {
+	totaldiff := 0.0
+
+	for x := img1.Bounds().Min.X; x < img1.Bounds().Max.X; x += 1 {
+		p1 := tofloat(img1.At(x, y))
+		p2 := tofloat(img2.At(x, y))
+
+		var totplus float64 = 0.0
+		absdiff := math.Abs(p2[3] - p1[3])
+		diffpixel := []float64{1.0, 1.0, 1.0}
+
+		for i := 0; i < 3; i += 1 {
+			diff := p2[i] - p1[i]
+			absdiff += math.Abs(diff)
+			totplus += math.Max(0, diff)
+			diffpixel[i] += diff
+		}
+		totaldiff += absdiff
+
+		for i := 0; i < 3; i += 1 {
+			diffpixel[i] -= totplus
+			if absdiff > 0 && absdiff < (5.0 / 255.0) {
+				diffpixel[i] -= (5.0 / 255.0)
+			}
+			diffpixel[i] = math.Max(0.0, diffpixel[i])
+		}
+
+		p := color.NRGBA{R: uint8(diffpixel[0] * 255.0),
+				G: uint8(diffpixel[1] * 255.0), 
+				B: uint8(diffpixel[2] * 255.0),
+				A: 255}
+		mapimg.Set(x, y, p)
+	}
+
+	ndiff <- totaldiff
 }
 
 func main() {
@@ -42,38 +80,14 @@ func main() {
 	totaldiff := 0.0
 	mapimg := image.NewNRGBA(img1.Bounds())
 
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	diffmeasurements := make(chan float64, img1.Bounds().Max.Y - img1.Bounds().Min.Y)
 	for y := img1.Bounds().Min.Y; y < img1.Bounds().Max.Y; y += 1 {
-		for x := img1.Bounds().Min.X; x < img1.Bounds().Max.X; x += 1 {
-			p1 := tofloat(img1.At(x, y))
-			p2 := tofloat(img2.At(x, y))
-
-			var totplus float64 = 0.0
-			absdiff := math.Abs(p2[3] - p1[3])
-			diffpixel := []float64{1.0, 1.0, 1.0}
-
-			for i := 0; i < 3; i += 1 {
-				diff := p2[i] - p1[i]
-				absdiff += math.Abs(diff)
-				totplus += math.Max(0, diff)
-				diffpixel[i] += diff
-			}
-
-			totaldiff += absdiff
-
-			for i := 0; i < 3; i += 1 {
-				diffpixel[i] -= totplus
-				if absdiff > 0 && absdiff < (5.0 / 255.0) {
-					diffpixel[i] -= (5.0 / 255.0)
-				}
-				diffpixel[i] = math.Max(0.0, diffpixel[i])
-			}
-
-			p := color.NRGBA{R: uint8(diffpixel[0] * 255.0),
-					G: uint8(diffpixel[1] * 255.0), 
-					B: uint8(diffpixel[2] * 255.0),
-					A: 255}
-			mapimg.Set(x, y, p)
-		}
+		go calcrow(diffmeasurements, img1, img2, mapimg, y)
+	}
+	for y := img1.Bounds().Min.Y; y < img1.Bounds().Max.Y; y += 1 {
+		ndiff := <- diffmeasurements
+		totaldiff += ndiff
 	}
 
 	mapfile, _ := os.Create(os.Args[3])

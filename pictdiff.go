@@ -1,66 +1,80 @@
 package main
 
 import "image"
-import "image/color"
+import "image/draw"
 import _ "image/jpeg"
 import "image/png"
 import "os"
 import "log"
-import "math"
 import "fmt"
 import "runtime"
 
-func tofloat(p color.Color) ([]float64) {
-	r, g, b, a := p.RGBA()
-	return []float64{float64(r) / 65535.0,
-			float64(g) / 65535.0,
-			float64(b) / 65535.0,
-			float64(a) / 65535.0}
+func AsList(img *image.RGBA, x int, y int) ([]int) {
+	off := img.PixOffset(x, y)
+	r := int(img.Pix[off])
+	g := int(img.Pix[off + 1])
+	b := int(img.Pix[off + 2])
+	a := int(img.Pix[off + 3])
+	return []int{r, g, b, a}
+}
+
+func Abs(x int) (r int) {
+	r = x
+	if r < 0 {
+		r = -r
+	}
+	return 
+}
+
+func Max(x int, y int) (r int) {
+	r = x
+	if y > x {
+		r = y
+	}
+	return
 }
 
 type calcrowret struct {
 	Y int
-	Diff float64
-	Pixels *[]color.NRGBA
+	Diff int
+	Pixels *[]uint8
 }
 
-func calcrow(c chan calcrowret, img1 image.Image, img2 image.Image, mapimg *image.NRGBA, y int) {
-	totaldiff := 0.0
-	n := img1.Bounds().Max.X - img1.Bounds().Min.X
-	pixel_list := make([]color.NRGBA, n, n)
+func calcrow(c *chan calcrowret, img1 *image.RGBA, img2 *image.RGBA, y int, width int) {
+	totaldiff := 0
+	pixel_list := make([]uint8, width * 4, width * 4)
 
-	for x := img1.Bounds().Min.X; x < img1.Bounds().Max.X; x += 1 {
-		p1 := tofloat(img1.At(x, y))
-		p2 := tofloat(img2.At(x, y))
+	for x := 0; x < width; x += 1 {
+		p1 := AsList(img1, x, y)
+		p2 := AsList(img2, x, y)
 
-		var totplus float64 = 0.0
-		absdiff := math.Abs(p2[3] - p1[3])
-		diffpixel := []float64{1.0, 1.0, 1.0}
+		totplus := 0
+		absdiff := Abs(p2[3] - p1[3])
+		diffpixel := []int{255, 255, 255}
 
 		for i := 0; i < 3; i += 1 {
 			diff := p2[i] - p1[i]
-			absdiff += math.Abs(diff)
-			totplus += math.Max(0, diff)
+			absdiff += Abs(diff)
+			totplus += Max(0, diff)
 			diffpixel[i] += diff
 		}
 		totaldiff += absdiff
 
 		for i := 0; i < 3; i += 1 {
 			diffpixel[i] -= totplus
-			if absdiff > 0 && absdiff < (5.0 / 255.0) {
-				diffpixel[i] -= (5.0 / 255.0)
+			if absdiff > 0 && absdiff < 5 {
+				diffpixel[i] -= 5
 			}
-			diffpixel[i] = math.Max(0.0, diffpixel[i])
+			diffpixel[i] = Max(0, diffpixel[i])
 		}
 
-		p := color.NRGBA{R: uint8(diffpixel[0] * 255.0),
-				G: uint8(diffpixel[1] * 255.0), 
-				B: uint8(diffpixel[2] * 255.0),
-				A: 255}
-		pixel_list[x - img1.Bounds().Min.X] = p
+		pixel_list[x * 4 + 0] = uint8(diffpixel[0])
+		pixel_list[x * 4 + 1] = uint8(diffpixel[1])
+		pixel_list[x * 4 + 2] = uint8(diffpixel[2])
+		pixel_list[x * 4 + 3] = 255
 	}
 
-	c <- calcrowret{Y: y, Diff: totaldiff, Pixels: &pixel_list}
+	*c <- calcrowret{Y: y, Diff: totaldiff, Pixels: &pixel_list}
 }
 
 func main() {
@@ -72,32 +86,45 @@ func main() {
 	if err != nil {
 		log.Fatal("New image could not be opened")
 	}
-	img1, _, err := image.Decode(f1)
+	rimg1, _, err := image.Decode(f1)
 	if err != nil {
 		log.Fatal("Old image could not be decoded")
 	}
-	img2, _, err := image.Decode(f2)
+	rimg2, _, err := image.Decode(f2)
 	if err != nil {
 		log.Fatal("New image could not be decoded")
 	}
 	
-	if img1.Bounds() != img2.Bounds() {
+	if rimg1.Bounds() != rimg2.Bounds() {
 		log.Fatal("Images don't have the same size")
 	}
+
+	width := rimg1.Bounds().Dx()
+	height := rimg1.Bounds().Dy()
+
+	img1 := image.NewRGBA(image.Rect(0, 0, width, height))
+	img2 := image.NewRGBA(image.Rect(0, 0, width, height))
+	draw.Draw(img1, img1.Bounds(), rimg1, rimg1.Bounds().Min, draw.Src)
+	draw.Draw(img2, img2.Bounds(), rimg2, rimg2.Bounds().Min, draw.Src)
 	
-	totaldiff := 0.0
+	totaldiff := 0
 	mapimg := image.NewNRGBA(img1.Bounds())
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	diffmeasurements := make(chan calcrowret, img1.Bounds().Max.Y - img1.Bounds().Min.Y)
-	for y := img1.Bounds().Min.Y; y < img1.Bounds().Max.Y; y += 1 {
-		go calcrow(diffmeasurements, img1, img2, mapimg, y)
+	diffmeasurements := make(chan calcrowret, height)
+	for y := 0; y < height; y += 1 {
+		go calcrow(&diffmeasurements, img1, img2, y, width)
 	}
-	for y := img1.Bounds().Min.Y; y < img1.Bounds().Max.Y; y += 1 {
+	for y := 0; y < height; y += 1 {
 		result := <- diffmeasurements
 		totaldiff += result.Diff
-		for x := img1.Bounds().Min.X; x < img1.Bounds().Max.X; x += 1 {
-			mapimg.Set(x, result.Y, (*result.Pixels)[x - img1.Bounds().Min.X])
+		for x := 0; x < width; x += 1 {
+			off := mapimg.PixOffset(x, result.Y)
+			off2 := x * 4
+			mapimg.Pix[off + 0] = (*result.Pixels)[off2 + 0]
+			mapimg.Pix[off + 1] = (*result.Pixels)[off2 + 1]
+			mapimg.Pix[off + 2] = (*result.Pixels)[off2 + 2]
+			mapimg.Pix[off + 3] = (*result.Pixels)[off2 + 3]
 		}
 	}
 
@@ -105,5 +132,5 @@ func main() {
 	defer mapfile.Close()
 
     	png.Encode(mapfile, mapimg)
-	fmt.Printf("Difference: %v\n", int(0.5 + totaldiff * 255.0))
+	fmt.Printf("Difference: %v\n", totaldiff)
 }

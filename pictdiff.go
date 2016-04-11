@@ -1,3 +1,5 @@
+// run as standalone binary for best performance (20x difference)
+
 package main
 
 import "image"

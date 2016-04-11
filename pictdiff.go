@@ -79,38 +79,41 @@ func calcrow(c *chan calcrowret, img1 *image.RGBA, img2 *image.RGBA, y int, widt
 	*c <- calcrowret{Y: y, Diff: totaldiff, Pixels: &pixel_list}
 }
 
+func Load(c *chan *image.RGBA, name string) {
+	f, err := os.Open(name)
+	if err != nil {
+		log.Fatal("Image could not be opened")
+	}
+	rimg, _, err := image.Decode(f)
+	if err != nil {
+		log.Fatal("Image could not be decoded")
+	}
+	width := rimg.Bounds().Dx()
+	height := rimg.Bounds().Dy()
+	img := image.NewRGBA(image.Rect(0, 0, width, height))
+	draw.Draw(img, img.Bounds(), rimg, rimg.Bounds().Min, draw.Src)
+	*c <- img
+}
+
 func main() {
-	f1, err := os.Open(os.Args[1])
-	if err != nil {
-		log.Fatal("Old image could not be opened")
-	}
-	f2, err := os.Open(os.Args[2])
-	if err != nil {
-		log.Fatal("New image could not be opened")
-	}
-	rimg1, _, err := image.Decode(f1)
-	if err != nil {
-		log.Fatal("Old image could not be decoded")
-	}
-	rimg2, _, err := image.Decode(f2)
-	if err != nil {
-		log.Fatal("New image could not be decoded")
-	}
-	
-	if rimg1.Bounds() != rimg2.Bounds() {
+	cimg1 := make(chan *image.RGBA)
+	cimg2 := make(chan *image.RGBA)
+
+	go Load(&cimg1, os.Args[1])
+	go Load(&cimg2, os.Args[2])
+
+	img1 := <- cimg1
+	img2 := <- cimg2
+
+	if img1.Bounds() != img2.Bounds() {
 		log.Fatal("Images don't have the same size")
 	}
 
-	width := rimg1.Bounds().Dx()
-	height := rimg1.Bounds().Dy()
+	width := img1.Bounds().Dx()
+	height := img1.Bounds().Dy()
 
-	img1 := image.NewRGBA(image.Rect(0, 0, width, height))
-	img2 := image.NewRGBA(image.Rect(0, 0, width, height))
-	draw.Draw(img1, img1.Bounds(), rimg1, rimg1.Bounds().Min, draw.Src)
-	draw.Draw(img2, img2.Bounds(), rimg2, rimg2.Bounds().Min, draw.Src)
-	
 	totaldiff := 0
-	mapimg := image.NewNRGBA(img1.Bounds())
+	mapimg := image.NewNRGBA(image.Rect(0, 0, width, height))
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	diffmeasurements := make(chan calcrowret, height)

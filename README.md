@@ -15,8 +15,9 @@ tinted diff image:
 
 ![Original image](https://raw.githubusercontent.com/elvis-epx/pictdiff/master/img/diffinv.png) 
 
-There is a Python reference implementation;
-and the Rust implementation that runs 40x faster.
+There is a Python reference implementation.
+The Rust implementation runs 100x faster, and the Go version runs 60x faster (I accept optimization
+suggestions).
 
 How to use the Python version:
 
@@ -72,6 +73,17 @@ cargo run --release img1.png img2.png diff.png
 After it runs the first time succesfully, you can copy the binary
 from target/release/pictdiff to /usr/local/bin or other convenient
 location.
+
+# Go version
+
+Assuming you have the Go toolchain installed and configured:
+
+```
+go build pictdiff.go
+```
+
+Run the executable "pictdiff" created in the folder. The command 
+"go run" also runs it, albeit more slowly.
 
 # Motivation
 

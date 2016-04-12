@@ -137,5 +137,5 @@ func main() {
 	defer mapfile.Close()
 
     	png.Encode(mapfile, mapimg)
-	fmt.Printf("Difference: %v\n", totaldiff)
+	fmt.Printf("%v\n", totaldiff)
 }

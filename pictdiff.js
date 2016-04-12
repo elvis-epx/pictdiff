@@ -61,7 +61,7 @@ function compare(img1, img2, imgmap)
 		for (i = 0; i < 3; ++i) {
 			diffpixel[i] -= totplus;
 			if (absdiff > 0 && absdiff < 5) {
-				diffpixel[i] -= 5;
+				diffpixel[i] -= 2;
 			}
 			diffpixel[i] = Math.max(0, diffpixel[i]);
 			imgmap.bitmap.data[ idx + i ] = diffpixel[i];

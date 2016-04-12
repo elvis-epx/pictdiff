@@ -65,7 +65,7 @@ func calcrow(c *chan calcrowret, img1 *image.RGBA, img2 *image.RGBA, y int, widt
 		for i := 0; i < 3; i += 1 {
 			diffpixel[i] -= totplus
 			if absdiff > 0 && absdiff < 5 {
-				diffpixel[i] -= 5
+				diffpixel[i] -= 2
 			}
 			diffpixel[i] = Max(0, diffpixel[i])
 		}

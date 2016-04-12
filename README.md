@@ -51,11 +51,12 @@ is generally more red than "img2", then "diff" will be cyan. On the
 other hand, if "img2" is more red than "img1", then "diff" will be red-tinted.
 
 Differences in alpha (opacity) have twofold effects. They are added
-to the total absolute difference, which are rendered as gray in diff
+to the total absolute difference, which is rendered as gray in diff
 image. This guarantees that alpha differences will be clearly revealed,
-even if the color did not change.
+even if the color did not change. And, of course, the number returned
+by the utility will be non-zero.
 
-Also, the color channels are multiplied by alpha, so the color differences
+On top of that, the color channels are multiplied by alpha, so the color differences
 are mitigated when both images are quite transparent. In the extreme case, two
 completely transparent images (alpha=0) will be considered equal, even
 if one is "red" and another is "blue".
@@ -69,8 +70,8 @@ the Rust toolchain, you can run the Rust version instead:
 cargo run --release img1.png img2.png diff.png
 ```
 
-After it runs the first time succesfully, you can copy the binary
-from target/release/pictdiff to /usr/local/bin or other convenient
+After it runs the first time successfully, you can copy the binary
+from target/release/pictdiff to /usr/local/bin or another convenient
 location.
 
 # Go version
@@ -79,6 +80,7 @@ Assuming you have the Go toolchain installed and configured:
 
 ```
 go build pictdiff.go
+./pictdiff old.png new.png diff.png
 ```
 
 Run the executable "pictdiff" created in the folder. The command 
@@ -90,7 +92,7 @@ Assuming you have Node.js installed:
 
 ```
 npm install
-node pictdiff.node old.png new.png diffmap.png
+node pictdiff.js old.png new.png diffmap.png
 ```
 
 # Motivation

@@ -15,9 +15,8 @@ tinted diff image:
 
 ![Original image](https://raw.githubusercontent.com/elvis-epx/pictdiff/master/img/diffinv.png) 
 
-There is a Python reference implementation.
-The Rust implementation runs 100x faster, and the Go version runs 60x faster (I accept optimization
-suggestions).
+There is a Python reference implementation, and implementations in other languages: Rust, Go and Node.js.
+Currently, the Rust version is the fastest (100x the reference implementation).
 
 How to use the Python version:
 
@@ -84,6 +83,15 @@ go build pictdiff.go
 
 Run the executable "pictdiff" created in the folder. The command 
 "go run" also runs it, albeit more slowly.
+
+# Node.js version
+
+Assuming you have Node.js installed:
+
+```
+npm install
+node pictdiff.node old.png new.png diffmap.png
+```
 
 # Motivation
 

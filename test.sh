@@ -13,6 +13,7 @@ REF2=test_data/reference_diffa.png
 REFMETRIC1=2089964
 REFMETRIC2=11180000
 
+npm install
 go build pictdiff.go || exit 1
 cargo build --release || exit 1
 

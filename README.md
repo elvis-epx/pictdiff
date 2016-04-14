@@ -16,7 +16,6 @@ tinted diff image:
 ![Original image](https://raw.githubusercontent.com/elvis-epx/pictdiff/master/img/diffinv.png) 
 
 There is a Python reference implementation, and implementations in other languages: Rust, Go and Node.js.
-Currently, the Rust version is the fastest (100x the reference implementation).
 
 How to use the Python version:
 
@@ -115,6 +114,16 @@ marks any difference as a red pixel. The threshold can be configured,
 but the generated diff image is an all-or-nothing comparison. I needed
 a diff image for quick inspection of changes, and the image should show
 the magnitude of these differences, as well as how color was affected.
+
+# Performance
+
+The Python version is slow, but it was the first one, so it serves as the
+reference for the others, that must generate exactly the same results given
+the same images to compare.
+
+Right now, the Rust version is the fastest: 100x the speed of reference impl. Go is 60x,
+Node.js is 12x. Running the Python version with PyPy yields 10-11x, roughly equivalent
+to Node. 
 
 # Bugs
 

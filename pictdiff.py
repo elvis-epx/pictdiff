@@ -39,34 +39,24 @@ for y in range(img1.size[1]):
         	p1 = i1[x, y]
         	p2 = i2[x, y]
 		diffpixel = [255, 255, 255]
+		absdiff = abs(p2[3] - p1[3])
+		diffs = [0, 0, 0]
+		totplus = 0
 
-		# color differences, including alpha channel
-		diffs = [
-				pre_mult_alpha(p1, p2, 0), 
-				pre_mult_alpha(p1, p2, 1),
-				pre_mult_alpha(p1, p2, 2),
-				p2[3] - p1[3]
-			]
-		absdiff = reduce(lambda a, b: abs(a) + abs(b), diffs)
+		for i in range(0, 3):
+			diffs[i] = pre_mult_alpha(p1, p2, i)
+			absdiff += abs(diffs[i])
+			diffpixel[i] += diffs[i]
+			totplus += max(0, diffs[i])
+
 		totaldiff += absdiff
 
-		# these are for tinting, alpha left out of equation
-		diffs = diffs[0:3]
-		diffplus = [max(0, a) for a in diffs]
-		totplus = reduce(lambda a, b: a + b, diffplus)
-		diffminus = [min(0, a) for a in diffs]
-
-		# apply negative differences (e.g. less red -> take red)
-		diffpixel = [ a + b for a, b in zip(diffpixel, diffminus)]
-		# subtract positive differences (e.g. more red -> take from non-red channels)
-		diffpixel = [ a - totplus for a in diffpixel ]
-		# ... put back what we took from red
-		diffpixel = [ a + b for a, b in zip(diffpixel, diffplus)]
-		
-		if absdiff > 0 and absdiff < MINUTE:
-			# Increase contrast of minute differences
-			diffpixel = [a - INCREASE_MINUTE for a in diffpixel]
-		diffpixel = [max(0, a) for a in diffpixel]
+		for i in range(0, 3):
+			diffpixel[i] -= totplus
+			if absdiff > 0 and absdiff < MINUTE:
+				# Increase contrast of minute differences
+				diffpixel[i] -= INCREASE_MINUTE
+			diffpixel[i] = max(0, diffpixel[i])
 		
 		imap[x, y] = tuple(diffpixel)
 

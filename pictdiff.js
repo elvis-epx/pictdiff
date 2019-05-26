@@ -81,7 +81,7 @@ function compare(img1, img2, imgmap)
 
 	imgmap.write(process.argv[4], (err) => {
 		if (err) {
-			console.error("Could not write diff file.");
+			console.error("Could not write diff map.");
 		}
 		console.log(totaldiff);
 	});
@@ -90,7 +90,7 @@ function compare(img1, img2, imgmap)
 function usage()
 {
 	console.error();
-	console.error("Usage: node pictidff.js <picture A> <picture B> <writable diff picture>");
+	console.error("Usage: node pictidff.js <picture A> <picture B> <diff map>");
 	console.error();
 	console.error("Example: node pictidff.js a.png b.png diff.png");
 	console.error();

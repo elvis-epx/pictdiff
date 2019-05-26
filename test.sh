@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 OLD1=test_data/old.png
 NEW1=test_data/new.png

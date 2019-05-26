@@ -25,7 +25,7 @@ func Abs(x int) (r int) {
 	if r < 0 {
 		r = -r
 	}
-	return 
+	return
 }
 
 func Max(x int, y int) (r int) {
@@ -99,11 +99,20 @@ func main() {
 	cimg1 := make(chan *image.RGBA)
 	cimg2 := make(chan *image.RGBA)
 
+	if len(os.Args) < 4 {
+		os.Stderr.WriteString("\n")
+		os.Stderr.WriteString("Usage: pictdiff <picture A> <picture B> <diff map>\n")
+		os.Stderr.WriteString("\n")
+		os.Stderr.WriteString("Example: pictdiff a.png b.png diff.png\n")
+		os.Stderr.WriteString("\n")
+		os.Exit(2)
+	}
+
 	go Load(&cimg1, os.Args[1])
 	go Load(&cimg2, os.Args[2])
 
-	img1 := <- cimg1
-	img2 := <- cimg2
+	img1 := <-cimg1
+	img2 := <-cimg2
 
 	if img1.Bounds() != img2.Bounds() {
 		log.Fatal("Images don't have the same size")
@@ -121,7 +130,7 @@ func main() {
 		go calcrow(&diffmeasurements, img1, img2, y, width)
 	}
 	for y := 0; y < height; y += 1 {
-		result := <- diffmeasurements
+		result := <-diffmeasurements
 		totaldiff += result.Diff
 		for x := 0; x < width; x += 1 {
 			off := mapimg.PixOffset(x, result.Y)
@@ -133,9 +142,15 @@ func main() {
 		}
 	}
 
-	mapfile, _ := os.Create(os.Args[3])
-	defer mapfile.Close()
-
-    	png.Encode(mapfile, mapimg)
+	mapfile, err := os.Create(os.Args[3])
+	if err != nil {
+		os.Stderr.WriteString("Cannot open diff map file for writing\n")
+	} else {
+		defer mapfile.Close()
+		err := png.Encode(mapfile, mapimg)
+		if err != nil {
+			os.Stderr.WriteString("Cannot write to diff map file\n")
+		}
+	}
 	fmt.Printf("%v\n", totaldiff)
 }

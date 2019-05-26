@@ -22,15 +22,28 @@ fn main()
 	
 	let args: Vec<_> = env::args().collect();
 	if args.len() < 4 {
-		println!("Usage: {} oldpicture newpicture diffmap", &args[0]);
+		println!("Usage: {} <picture A> <picture B> <diff map>", &args[0]);
 		process::exit(2);
 	}
 
-	let img1 = image::open(&Path::new(&args[1])).unwrap();
-	let img2 = image::open(&Path::new(&args[2])).unwrap();
+	let img1 = match image::open(&Path::new(&args[1])) {
+		Ok(img1) => img1,
+		Err(_) => {
+			println!("First file cannot be read or it is not a picture.");
+			process::exit(1);
+		},
+	};
+
+	let img2 = match image::open(&Path::new(&args[2])) {
+		Ok(img2) => img2,
+		Err(_) => {
+			println!("Second file cannot be read or it is not a picture.");
+			process::exit(1);
+		},
+	};
 	
 	if img1.dimensions() != img2.dimensions() {
-		println!("Images have different sizes, cannot compare");
+		println!("Pictures have different sizes, cannot compare");
 		process::exit(1);
 	}
 	
@@ -74,6 +87,11 @@ fn main()
 		*mappixel = image::Rgb(diffpixel8);
 	}
 	
-	let _ = imgmap.save(&args[3]).unwrap();
+	let _ = match imgmap.save(&args[3]) {
+		Ok(res) => res,
+		Err(_) => {
+			println!("Diff map could not be written.");
+		},
+	};
 	println!("{}", totaldiff);
 }

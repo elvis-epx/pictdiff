@@ -7,7 +7,7 @@ import sys
 from PIL import Image
 
 if len(sys.argv) < 4:
-	print("Usage: %s oldpicture newpicture diffmap" % sys.argv[0], file=sys.stderr)
+	print("Usage: %s <picture A> <picture B> <diff map>" % sys.argv[0], file=sys.stderr)
 	sys.exit(2)
 
 try:
@@ -72,5 +72,5 @@ for y in range(img1.size[1]):
 try:
 	imgmap.save(sys.argv[3])
 except PermissionError:
-	print("Could not write to diff picture file.", file=sys.stderr)
+	print("Could not write to diff map.", file=sys.stderr)
 print(totaldiff)

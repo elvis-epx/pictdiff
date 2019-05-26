@@ -1,14 +1,23 @@
 var j = require("jimp");
+var fs = require("fs");
 
 function start()
 {
 	j.read(process.argv[2], (err, img1) => {
-		if (err) throw err;
+		if (err) {
+			console.error("First file is not a picture or is not readable.");
+			process.exit(1);
+			return;
+		}
 		j.read(process.argv[3], (err, img2) => {
-			if (err) throw err;
+			if (err) {
+				console.error("Second file is not a picture or is not readable.");
+				process.exit(1);
+				return;
+			}
 			if (img1.bitmap.width !== img2.bitmap.width ||
 					img1.bitmap.height !== img2.bitmap.height) {
-				console.log("The images don't have the same size");
+				console.error("Pictures to be compared must have the same size");
 				process.exit(1);
 				return;
 			}
@@ -70,8 +79,25 @@ function compare(img1, img2, imgmap)
 		totaldiff += absdiff;
 	});
 
-	imgmap.write(process.argv[4]);
-	console.log(totaldiff);
+	imgmap.write(process.argv[4], (err) => {
+		if (err) {
+			console.error("Could not write diff file.");
+		}
+		console.log(totaldiff);
+	});
 }
 
+function usage()
+{
+	console.error();
+	console.error("Usage: node pictidff.js <picture A> <picture B> <writable diff picture>");
+	console.error();
+	console.error("Example: node pictidff.js a.png b.png diff.png");
+	console.error();
+}
+
+if (process.argv.length < 5) {
+	usage();
+	return;
+}
 start();

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 MINUTE = 5 # less than "x" points of difference
 INCREASE_MINUTE = 2 # boost of minute differences
@@ -7,18 +7,27 @@ import sys
 from PIL import Image
 
 if len(sys.argv) < 4:
-	print "Usage: %s oldpicture newpicture diffmap" % sys.argv[0]
+	print("Usage: %s oldpicture newpicture diffmap" % sys.argv[0], file=sys.stderr)
 	sys.exit(2)
 
-img1 = Image.open(sys.argv[1]).convert('RGBA')
-img2 = Image.open(sys.argv[2]).convert('RGBA')
+try:
+	img1 = Image.open(sys.argv[1]).convert('RGBA')
+except FileNotFoundError:
+	print("First file could not be opened or it is not a picture.", file=sys.stderr)
+	sys.exit(2)
+
+try:
+	img2 = Image.open(sys.argv[2]).convert('RGBA')
+except FileNotFoundError:
+	print("Second file could not be opened or it is not a picture.", file=sys.stderr)
+	sys.exit(2)
 
 i1 = img1.load()
 i2 = img2.load()
 
 if img1.size != img2.size:
-	print "Images %s and %s have different sizes, cannot compare" \
-		% (sys.argv[1], sys.argv[2])
+	print("Pictures %s and %s have different sizes, cannot compare" \
+		% (sys.argv[1], sys.argv[2]), file=sys.stderr)
 	sys.exit(1)
 
 imgmap = Image.new('RGB', img1.size, "white")
@@ -36,8 +45,8 @@ def pre_mult_alpha(old, new, channel):
 
 for y in range(img1.size[1]):
 	for x in range(img1.size[0]):
-        	p1 = i1[x, y]
-        	p2 = i2[x, y]
+		p1 = i1[x, y]
+		p2 = i2[x, y]
 		diffpixel = [255, 255, 255]
 		absdiff = abs(p2[3] - p1[3])
 		diffs = [0, 0, 0]
@@ -60,5 +69,8 @@ for y in range(img1.size[1]):
 		
 		imap[x, y] = tuple(diffpixel)
 
-imgmap.save(sys.argv[3])
-print totaldiff
+try:
+	imgmap.save(sys.argv[3])
+except PermissionError:
+	print("Could not write to diff picture file.", file=sys.stderr)
+print(totaldiff)

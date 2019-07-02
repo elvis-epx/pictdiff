@@ -17,15 +17,15 @@ npm install
 go build pictdiff.go || exit 1
 cargo build --release || exit 1
 
-for version in "./pictdiff.py" "target/release/pictdiff" "./pictdiff" "node pictdiff.js"; do
+for flavor in "./pictdiff.py" "pypy3 ./pictdiff.py" "target/release/pictdiff" "./pictdiff" "node pictdiff.js"; do
 	for sample in 1 2; do
 		OLD="OLD$sample"
 		NEW="NEW$sample"
 		REF="REF$sample"
 		REFMETRIC="REFMETRIC$sample"
 
-		$version ${!OLD} ${!NEW} tmp.png || exit 1
-		METRIC=$($version ${!OLD} ${!NEW} tmp.png)
+		$flavor ${!OLD} ${!NEW} tmp.png || exit 1
+		METRIC=$($flavor ${!OLD} ${!NEW} tmp.png)
 		if [ "$METRIC" -ne "${!REFMETRIC}" ]; then
 			echo "Command produced an unexpected diff metric"
 			exit 1

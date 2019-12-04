@@ -1,7 +1,7 @@
 use std::env;
 use std::process;
 extern crate image;
-use image::GenericImage;
+use image::GenericImageView;
 use image::ImageBuffer;
 use image::Rgba;
 use std::cmp;

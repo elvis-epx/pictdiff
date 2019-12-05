@@ -127,7 +127,7 @@ Measurements taken after a couple warm-up runs.
 
 Linux x86-64 with Intel i5-7200, measuring wall clock time:
 
-| Flavor         | Relative speed | Wall clock time |
+| Flavor         | Relative speed | Wall clock time (ms) |
 | -------------- |:-------------:| -----:|
 | Python 3.6.2   | 1x | 56534 |
 | PyPy-3.6 7.2 | 5x   | 11638 |
@@ -135,11 +135,11 @@ Linux x86-64 with Intel i5-7200, measuring wall clock time:
 | Node.js 12.13.1 | 11x   | 4966 |
 | Rust 1.39.0    | 27x   | 2084 |
 
-(*) Goroutines take advantage of the multiple cores and the wall clock time issmaller than user time (6128).
+(*) Goroutines take advantage of the multiple cores and the wall clock time is less than user time (6128).
 
 Mac Mini Late 2014 with somewhat older toolchain and measuring user time + sys time:
 
-| Flavor         | Relative speed | User + sys time |
+| Flavor         | Relative speed | User + sys time (ms) |
 | -------------- |:-------------:| -----:|
 | Python 3.7.2   | 1x | 86789 |
 | PyPy-3.6 7.1.1 | 6x   | 14107 |

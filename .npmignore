@@ -1,0 +1,12 @@
+src/
+target/
+Cargo.*
+img/
+test_data/
+test.sh
+README.md
+node_modules/
+pictdiff
+requirements.txt
+pictdiff.py
+pictdiff.go

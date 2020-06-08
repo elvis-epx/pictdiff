@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var j = require("jimp");
 var fs = require("fs");
 

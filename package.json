@@ -3,7 +3,10 @@
   "description": "pictdiff",
   "author": "Elvis Pfutzenreuter <epxx@epxx.co>",
   "dependencies": {
-    "jimp": ">= 0.2.1"
+    "jimp": "^0.13.0"
   },
-  "engine": "node >= 0.10.0"
+  "engine": "node >= 0.10.0",
+  "bin": {
+    "pictdiff": "./pictdiff.js"
+  }
 }

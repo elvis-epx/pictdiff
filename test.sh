@@ -17,7 +17,7 @@ npm install
 go build pictdiff.go || exit 1
 cargo build --release || exit 1
 
-for flavor in "./pictdiff.py" "pypy3 ./pictdiff.py" "target/release/pictdiff" "./pictdiff" "node pictdiff.js"; do
+for flavor in "./pictdiff.py" "target/release/pictdiff" "./pictdiff" "node pictdiff.js"; do
 	for sample in 1 2; do
 		OLD="OLD$sample"
 		NEW="NEW$sample"

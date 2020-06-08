@@ -1,6 +1,6 @@
 # pictdiff
 
-This program implements image comparison by generating an image for visual inspection.
+This program implements image comparison by generating a picture for visual inspection.
 It also prints a rough diff metric number, zero means the images are exactly equal.
 
 For example, given two images:
@@ -123,6 +123,8 @@ Assuming you have Node.js installed:
 npm install
 node pictdiff.js old.png new.png diffmap.png
 ```
+
+You can also install pictdiff from npmjs.
 
 # Motivation
 

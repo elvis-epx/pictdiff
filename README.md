@@ -15,6 +15,22 @@ tinted diff image:
 
 ![Original image](https://raw.githubusercontent.com/elvis-epx/pictdiff/master/img/diffinv.png) 
 
+# I just want to use it!
+
+The Node.js version has been published in NPMJS, you can install via npm:
+
+```
+sudo npm install -g pictdiff
+```
+
+Usage:
+
+```
+node pictdiff.js old.png new.png diffmap.png
+```
+
+# I want to look into the code!
+
 There is a Python reference implementation, and implementations in other languages: Rust, Go and Node.js.
 
 How to use the Python flavor:

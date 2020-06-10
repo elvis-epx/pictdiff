@@ -1,6 +1,6 @@
 {
   "name": "pictdiff",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Visual diff of images",
   "homepage": "https://github.com/elvis-epx/pictdiff",
   "license": "BSD-3-Clause",

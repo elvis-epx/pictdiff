@@ -27,7 +27,7 @@ sudo npm install -g pictdiff
 Usage:
 
 ```
-node pictdiff.js old.png new.png diffmap.png
+pictdiff old.png new.png diffmap.png
 ```
 
 # How to interpret the diff image
@@ -117,14 +117,14 @@ Run the executable "pictdiff" created in the folder. The command
 
 # Node.js flavor
 
-Assuming you have Node.js installed:
+Assuming you have Node.js installed, you can run the Javascript flavor locally from the source:
 
 ```
 npm install
 node pictdiff.js old.png new.png diffmap.png
 ```
 
-You can also install pictdiff from npmjs.
+You can also install pictdiff from npmjs, as shown at the top of te page.
 
 # Motivation
 

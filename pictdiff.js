@@ -92,9 +92,9 @@ function compare(img1, img2, imgmap)
 function usage()
 {
 	console.error();
-	console.error("Usage: node pictdiff.js <picture A> <picture B> <diff map>");
+	console.error("Usage: pictdiff <picture A> <picture B> <diff map>");
 	console.error();
-	console.error("Example: node pictdiff.js a.png b.png diff.png");
+	console.error("Example: pictdiff a.png b.png diff.png");
 	console.error();
 }
 

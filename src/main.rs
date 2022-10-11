@@ -49,8 +49,8 @@ fn main()
 	
 	let (width, height) = img1.dimensions();
 
-	let img1 = img1.to_rgba();
-	let img2 = img2.to_rgba();
+	let img1 = img1.into_rgba8();
+	let img2 = img2.into_rgba8();
 	
 	let mut imgmap = ImageBuffer::new(width, height);
 	

@@ -149,7 +149,7 @@ Measurements taken after a couple warm-up runs.
 | -------------- | -----:|
 | Python 3.13.2   | 1x |
 | Go 1.24.1      |  6x (7x in wall clock)  | 
-| Node.js 20.11.1 | 10x |
+| Node.js 20.11.1 | 9x |
 | Rust 1.860   | 52x  | 
 
 # Bugs

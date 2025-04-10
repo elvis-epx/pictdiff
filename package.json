@@ -1,6 +1,7 @@
 {
   "name": "pictdiff",
-  "version": "1.0.5",
+  "type": "commonjs",
+  "version": "2.0.0",
   "description": "Visual diff of images",
   "homepage": "https://github.com/elvis-epx/pictdiff",
   "license": "BSD-3-Clause",
@@ -10,7 +11,7 @@
     "email": "epxx@epxx.co"
   },
   "dependencies": {
-    "jimp": "^0.13.0"
+    "jimp": "^1.6.0"
   },
   "scripts": {
     "test": "./test.sh"

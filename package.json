@@ -10,7 +10,7 @@
     "email": "epxx@epxx.co"
   },
   "dependencies": {
-    "jimp": "^0.13.0"
+    "jimp": "^1.6.0"
   },
   "scripts": {
     "test": "./test.sh"

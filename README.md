@@ -140,31 +140,17 @@ The Python flavor is slow. It was the first one and is the
 reference implementation. Alternative flavors must generate exactly the
 same results given the same images.
 
-The following table shows the absolute and relative performance of each
-flavor handling big images (img/big\_a.png and img/big\_b.png, 4019x2309).
+The following table shows the relative performance of each
+flavor handling big images (img/big\_a.png and img/big\_b.png, 4019x2309),
+run in a Macbook Pro M3.
 Measurements taken after a couple warm-up runs.
 
-Linux x86-64 with Intel i5-7200, measuring wall clock time:
-
-| Flavor         | Relative speed | Wall clock time (ms) |
-| -------------- |:-------------:| -----:|
-| Python 3.6.2   | 1x | 56534 |
-| PyPy-3.6 7.2 | 5x   | 11638 |
-| Go 1.13.4      | 11x   | 5218 (*) |
-| Node.js 12.13.1 | 11x   | 4966 |
-| Rust 1.39.0    | 27x   | 2084 |
-
-(*) Goroutines take advantage of the multiple cores and the wall clock time is less than user time (6128).
-
-Mac Mini Late 2014 with somewhat older toolchain and measuring user time + sys time:
-
-| Flavor         | Relative speed | User + sys time (ms) |
-| -------------- |:-------------:| -----:|
-| Python 3.7.2   | 1x | 86789 |
-| PyPy-3.6 7.1.1 | 6x   | 14107 |
-| Go 1.12.6      | 16x   | 5525 |
-| Node.js 12.5.0 | 19x   | 4619 |
-| Rust 1.25.0    | 39x   | 2200 |
+| Flavor         |Processor time |
+| -------------- | -----:|
+| Python 3.13.2   | 1x |
+| Go 1.24.1      |  6x (7x in wall clock)  | 
+| Node.js 20.11.1 | 10x |
+| Rust 1.860   | 52x  | 
 
 # Bugs
 

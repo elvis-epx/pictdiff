@@ -9,31 +9,13 @@ import "image/png"
 import "os"
 import "log"
 import "fmt"
-import "runtime"
-
-func AsList(img *image.RGBA, x int, y int) ([]int) {
-	off := img.PixOffset(x, y)
-	r := int(img.Pix[off])
-	g := int(img.Pix[off + 1])
-	b := int(img.Pix[off + 2])
-	a := int(img.Pix[off + 3])
-	return []int{r, g, b, a}
-}
 
 func Abs(x int) (r int) {
-	r = x
-	if r < 0 {
-		r = -r
-	}
-	return
-}
-
-func Max(x int, y int) (r int) {
-	r = x
-	if y > x {
-		r = y
-	}
-	return
+    r = x
+    if r < 0 {
+        r = -r
+    }
+    return
 }
 
 type calcrowret struct {
@@ -42,22 +24,26 @@ type calcrowret struct {
 	Pixels *[]uint8
 }
 
-func calcrow(c *chan calcrowret, img1 *image.RGBA, img2 *image.RGBA, y int, width int) {
+func calcrow(c chan calcrowret, img1 *image.RGBA, img2 *image.RGBA, y int, width int) {
 	totaldiff := 0
 	pixel_list := make([]uint8, width * 4, width * 4)
+    p1 := make([]uint8, 4, 4)
+    p2 := make([]uint8, 4, 4)
 
 	for x := 0; x < width; x += 1 {
-		p1 := AsList(img1, x, y)
-		p2 := AsList(img2, x, y)
+        off1 := img1.PixOffset(x, y)
+        off2 := img2.PixOffset(x, y)
+        copy(p1, img1.Pix[off1:])
+        copy(p2, img2.Pix[off2:])
 
 		totplus := 0
-		absdiff := Abs(p2[3] - p1[3])
-		diffpixel := []int{255, 255, 255}
+		absdiff := Abs(int(p2[3]) - int(p1[3]))
+		diffpixel := [3]int{255, 255, 255}
 
 		for i := 0; i < 3; i += 1 {
-			diff := p2[i] - p1[i]
+			diff := int(p2[i]) - int(p1[i])
 			absdiff += Abs(diff)
-			totplus += Max(0, diff)
+			totplus += max(0, diff)
 			diffpixel[i] += diff
 		}
 		totaldiff += absdiff
@@ -67,7 +53,7 @@ func calcrow(c *chan calcrowret, img1 *image.RGBA, img2 *image.RGBA, y int, widt
 			if absdiff > 0 && absdiff < 5 {
 				diffpixel[i] -= 2
 			}
-			diffpixel[i] = Max(0, diffpixel[i])
+			diffpixel[i] = max(0, diffpixel[i])
 		}
 
 		pixel_list[x * 4 + 0] = uint8(diffpixel[0])
@@ -76,10 +62,10 @@ func calcrow(c *chan calcrowret, img1 *image.RGBA, img2 *image.RGBA, y int, widt
 		pixel_list[x * 4 + 3] = 255
 	}
 
-	*c <- calcrowret{Y: y, Diff: totaldiff, Pixels: &pixel_list}
+	c <- calcrowret{Y: y, Diff: totaldiff, Pixels: &pixel_list}
 }
 
-func Load(c *chan *image.RGBA, name string) {
+func Load(c chan *image.RGBA, name string) {
 	f, err := os.Open(name)
 	if err != nil {
 		log.Fatal("Image could not be opened")
@@ -92,7 +78,7 @@ func Load(c *chan *image.RGBA, name string) {
 	height := rimg.Bounds().Dy()
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
 	draw.Draw(img, img.Bounds(), rimg, rimg.Bounds().Min, draw.Src)
-	*c <- img
+	c <- img
 }
 
 func main() {
@@ -108,8 +94,8 @@ func main() {
 		os.Exit(2)
 	}
 
-	go Load(&cimg1, os.Args[1])
-	go Load(&cimg2, os.Args[2])
+	go Load(cimg1, os.Args[1])
+	go Load(cimg2, os.Args[2])
 
 	img1 := <-cimg1
 	img2 := <-cimg2
@@ -124,22 +110,14 @@ func main() {
 	totaldiff := 0
 	mapimg := image.NewNRGBA(image.Rect(0, 0, width, height))
 
-	runtime.GOMAXPROCS(runtime.NumCPU())
 	diffmeasurements := make(chan calcrowret, height)
 	for y := 0; y < height; y += 1 {
-		go calcrow(&diffmeasurements, img1, img2, y, width)
+		go calcrow(diffmeasurements, img1, img2, y, width)
 	}
 	for y := 0; y < height; y += 1 {
 		result := <-diffmeasurements
 		totaldiff += result.Diff
-		for x := 0; x < width; x += 1 {
-			off := mapimg.PixOffset(x, result.Y)
-			off2 := x * 4
-			mapimg.Pix[off + 0] = (*result.Pixels)[off2 + 0]
-			mapimg.Pix[off + 1] = (*result.Pixels)[off2 + 1]
-			mapimg.Pix[off + 2] = (*result.Pixels)[off2 + 2]
-			mapimg.Pix[off + 3] = (*result.Pixels)[off2 + 3]
-		}
+        copy(mapimg.Pix[mapimg.PixOffset(0, result.Y):], *result.Pixels)
 	}
 
 	mapfile, err := os.Create(os.Args[3])

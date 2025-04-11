@@ -125,7 +125,7 @@ func main() {
 		os.Stderr.WriteString("Cannot open diff map file for writing\n")
 	} else {
 		defer mapfile.Close()
-		err := png.Encode(mapfile, mapimg)
+		err := (&png.Encoder{CompressionLevel: png.BestSpeed}).Encode(mapfile, mapimg)
 		if err != nil {
 			os.Stderr.WriteString("Cannot write to diff map file\n")
 		}

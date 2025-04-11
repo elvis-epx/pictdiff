@@ -157,7 +157,17 @@ Measurements taken after a couple warm-up runs.
 compresses more than the others. If set to "best speed", which compresses slightly less
 than the others, 12x.
 
-(\*\*) Go version uses goroutines which take advantage of multiple cores.
+Now, the same test, run without writing the output image (by means of chmod 400), which
+emphasizes the weight of our code and deemphasizes the performance of
+the image library:
+
+| Flavor         |Processor time |
+| -------------- | -----:|
+| Python 3.13.2   | 1x |
+| Node.js 20.11.1 | 8x |
+| Go 1.24.1 cpu time  |  17x |
+| Go 1.24.1 wall clock  | 35x |
+| Rust 1.86.0   | 71x  |
 
 # Bugs
 

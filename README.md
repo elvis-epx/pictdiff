@@ -151,7 +151,7 @@ Measurements taken after a couple warm-up runs.
 | Node.js 20.11.1 | 9x |
 | Go 1.24.1 cpu time  |  6x-12x (\*) |
 | Go 1.24.1 wall clock (\*\*) |  7x-14x |
-| Rust 1.860   | 52x  | 
+| Rust 1.86.0   | 52x  | 
 
 (\*) 6x with PNG encoder in default compression level, which is notoriously slow but
 compresses more than the others. If set to "best speed", which compresses slightly less

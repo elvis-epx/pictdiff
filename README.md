@@ -157,9 +157,11 @@ Measurements taken after a couple warm-up runs.
 compresses more than the others. If set to "best speed", which compresses slightly less
 than the others, 12x.
 
-Now, the same test, run without writing the output image (by means of chmod 400), which
-emphasizes the weight of our code and deemphasizes the performance of
-the image library:
+(\*\*) Looks faster when measured by wall-clock because of goroutines.
+Non-Go flavors are all single-threaded.
+
+The same test run without writing the output image (by means of chmod 400), which
+emphasizes the speed of our code and deemphasizes the performance of the image library:
 
 | Flavor         |Processor time |
 | -------------- | -----:|

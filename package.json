@@ -11,7 +11,8 @@
     "email": "epxx@epxx.co"
   },
   "dependencies": {
-    "jimp": "^1.6.0"
+    "jimp": "^1.6.0",
+    "node": "^22.15.0"
   },
   "scripts": {
     "test": "./test.sh"

@@ -153,23 +153,22 @@ Measurements taken after a couple warm-up runs.
 | Go 1.24.1 wall clock (\*\*) |  7x-14x |
 | Rust 1.86.0   | 52x  | 
 
-(\*) 6x with PNG encoder in default compression level, which is notoriously slow but
-compresses more than the others. If set to "best speed", which compresses slightly less
-than the others, 12x.
+(\*) Compression level of PNG encoder makes a big difference here. Default compression is notoriously slow, but compresses more than the other flavors. "Best speed" is much faster and final size is not outrageously different.
 
 (\*\*) Looks faster when measured by wall-clock because of goroutines.
 Non-Go flavors are all single-threaded.
 
-The same test run without writing the output image (by means of chmod 400), which
-emphasizes the speed of our code and deemphasizes the performance of the image library:
+The same tests run in Linux, processor is 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz (eight cores):
 
 | Flavor         |Processor time |
 | -------------- | -----:|
-| Python 3.13.2   | 1x |
-| Node.js 20.11.1 | 8x |
-| Go 1.24.1 cpu time  |  17x |
-| Go 1.24.1 wall clock  | 35x |
-| Rust 1.86.0   | 71x  |
+| Python 3.12.3   | 1x |
+| Node.js 20.5.1 | 10x |
+| Go 1.24.1 cpu time  | 9x-19x (\*) |
+| Go 1.24.1 wall clock  | 12x-27x |
+| Rust 1.86.0   | 32x  |
+
+(\*) Again, run with two levels of PNG encoding compression.
 
 # Bugs
 

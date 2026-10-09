@@ -18,13 +18,19 @@ func Abs(x int) (r int) {
     return
 }
 
+// Premultiply alpha, so color differences are mitigated by transparency.
+// Must round exactly like the Python reference: int(c * (a / 255.0))
+func PreMultAlpha(p []uint8, channel int) int {
+	return int(float64(p[channel]) * (float64(p[3]) / 255.0))
+}
+
 type calcrowret struct {
 	Y int
 	Diff int
 	Pixels *[]uint8
 }
 
-func calcrow(c chan calcrowret, img1 *image.RGBA, img2 *image.RGBA, y int, width int) {
+func calcrow(c chan calcrowret, img1 *image.NRGBA, img2 *image.NRGBA, y int, width int) {
 	totaldiff := 0
 	pixel_list := make([]uint8, width * 4, width * 4)
     p1 := make([]uint8, 4, 4)
@@ -41,7 +47,7 @@ func calcrow(c chan calcrowret, img1 *image.RGBA, img2 *image.RGBA, y int, width
 		diffpixel := [3]int{255, 255, 255}
 
 		for i := 0; i < 3; i += 1 {
-			diff := int(p2[i]) - int(p1[i])
+			diff := PreMultAlpha(p2, i) - PreMultAlpha(p1, i)
 			absdiff += Abs(diff)
 			totplus += max(0, diff)
 			diffpixel[i] += diff
@@ -65,7 +71,7 @@ func calcrow(c chan calcrowret, img1 *image.RGBA, img2 *image.RGBA, y int, width
 	c <- calcrowret{Y: y, Diff: totaldiff, Pixels: &pixel_list}
 }
 
-func Load(c chan *image.RGBA, name string) {
+func Load(c chan *image.NRGBA, name string) {
 	f, err := os.Open(name)
 	if err != nil {
 		log.Fatal("Image could not be opened")
@@ -76,14 +82,16 @@ func Load(c chan *image.RGBA, name string) {
 	}
 	width := rimg.Bounds().Dx()
 	height := rimg.Bounds().Dy()
-	img := image.NewRGBA(image.Rect(0, 0, width, height))
+	// NRGBA (non-premultiplied) so we can premultiply with the same rounding as
+	// the reference implementation. image.RGBA would premultiply with Go's own rounding.
+	img := image.NewNRGBA(image.Rect(0, 0, width, height))
 	draw.Draw(img, img.Bounds(), rimg, rimg.Bounds().Min, draw.Src)
 	c <- img
 }
 
 func main() {
-	cimg1 := make(chan *image.RGBA)
-	cimg2 := make(chan *image.RGBA)
+	cimg1 := make(chan *image.NRGBA)
+	cimg2 := make(chan *image.NRGBA)
 
 	if len(os.Args) < 4 {
 		os.Stderr.WriteString("\n")

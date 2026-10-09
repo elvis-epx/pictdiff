@@ -4,21 +4,26 @@ OLD1=test_data/old.png
 NEW1=test_data/new.png
 OLD2=test_data/olda.png
 NEW2=test_data/newa.png
+OLD3=test_data/oldb.png
+NEW3=test_data/newb.png
 REF1=test_data/reference_diff.png
 REF2=test_data/reference_diffa.png
+REF3=test_data/reference_diffb.png
 
 # ./pictdiff.py $OLD $NEW $REF
 # ./pictdiff.py $OLD2 $NEW2 $REF2
+# ./pictdiff.py $OLD3 $NEW3 $REF3
 
 REFMETRIC1=2089964
 REFMETRIC2=11180000
+REFMETRIC3=17711226
 
 npm install
 go build pictdiff.go || exit 1
 cargo build --release || exit 1
 
 for flavor in "./pictdiff.py" "target/release/pictdiff" "./pictdiff" "node pictdiff.js"; do
-	for sample in 1 2; do
+	for sample in 1 2 3; do
 		OLD="OLD$sample"
 		NEW="NEW$sample"
 		REF="REF$sample"

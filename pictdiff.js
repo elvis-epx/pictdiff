@@ -35,8 +35,9 @@ async function start()
 
 function mult_alpha(old, neu, channel)
 {
-    old = old[channel] * old[3] / 255.0
-    neu = neu[channel] * neu[3] / 255.0
+    // same operation order as the reference implementation, so rounding matches
+    old = old[channel] * (old[3] / 255.0)
+    neu = neu[channel] * (neu[3] / 255.0)
     return Math.floor(neu) - Math.floor(old)
 }
 

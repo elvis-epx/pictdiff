@@ -9,3 +9,4 @@ pictdiff
 requirements.txt
 pictdiff.py
 pictdiff.go
+cpuprofile

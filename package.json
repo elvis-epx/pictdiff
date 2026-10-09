@@ -19,6 +19,6 @@
   },
   "engine": "node >= 0.10.0",
   "bin": {
-    "pictdiff": "./pictdiff.js"
+    "pictdiff": "pictdiff.js"
   }
 }

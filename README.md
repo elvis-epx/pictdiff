@@ -30,6 +30,35 @@ Usage:
 pictdiff old.png new.png diffmap.png
 ```
 
+## Prebuilt binaries
+
+Standalone Rust and Go binaries for Linux, macOS and Windows are attached to each
+[GitHub release](https://github.com/elvis-epx/pictdiff/releases). No toolchain
+is needed: download the file for your platform, make it executable and run it.
+The Rust flavor is the fastest (see Performance below).
+
+| Platform              | Rust                                   | Go                             |
+| --------------------- | -------------------------------------- | ------------------------------ |
+| Linux x86-64          | pictdiff-rs-x86\_64-unknown-linux-musl  | pictdiff-go-linux-amd64        |
+| Linux ARM64           | pictdiff-rs-aarch64-unknown-linux-musl | pictdiff-go-linux-arm64        |
+| macOS Apple Silicon   | pictdiff-rs-aarch64-apple-darwin       | pictdiff-go-darwin-arm64       |
+| macOS Intel           | pictdiff-rs-x86\_64-apple-darwin        | pictdiff-go-darwin-amd64       |
+| Windows x86-64        | pictdiff-rs-x86\_64-pc-windows-msvc.exe | pictdiff-go-windows-amd64.exe  |
+
+```
+chmod +x pictdiff-rs-x86_64-unknown-linux-musl
+./pictdiff-rs-x86_64-unknown-linux-musl old.png new.png diffmap.png
+```
+
+The macOS binaries are not signed, so Gatekeeper blocks them on first run.
+To allow it, remove the quarantine attribute added by the browser:
+
+```
+xattr -d com.apple.quarantine pictdiff-rs-aarch64-apple-darwin
+```
+
+The SHA256SUMS file in each release can be used to verify the downloads.
+
 # How to interpret the diff image
 
 The diff "blank" image is white. Colorization of the diff image

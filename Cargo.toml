@@ -2,6 +2,7 @@
 name = "pictdiff"
 version = "0.4.0"
 authors = ["epx"]
+edition = "2021"
 
 [dependencies]
-image = "*"
+image = "0.25"
